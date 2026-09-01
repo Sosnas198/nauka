@@ -1,122 +1,97 @@
-# Kompletny przewodnik: Karuzela cytatów sterowana kliknięciem (jedna funkcja parametrowa + nasłuchiwacze zdarzeń)
+# Projekt JavaScript + DOM: karuzela cytatów (jedna funkcja parametrowa + nasłuchiwacze zdarzeń)
 
-Ten przewodnik tłumaczy **od A do Z**, jak działa skrypt przełączający trzy cytaty pracowników — kliknięcie w widoczny cytat ukrywa go i pokazuje kolejny w kolejce, tworząc efekt "karuzeli" cyklicznie wracającej do pierwszego cytatu.
+**Słowa kluczowe:** funkcja parametrowa, porównanie ścisłe (`===`), ukrywanie/pokazywanie elementu (`style.display = 'none' / 'block'`), nasłuchiwacz zdarzenia (`addEventListener('click', ...)`), funkcja anonimowa, wzorzec cykliczny "karuzeli" (1 → 2 → 3 → 1 → ...).
 
----
+Projekt uczy, jak **jedna** funkcja parametrowa może obsłużyć wiele podobnych
+przypadków (kliknięcie w jeden z trzech cytatów), zamiast pisać osobną
+funkcję dla każdego z nich — oraz jak podpiąć taką funkcję pod zdarzenia
+kliknięcia na kilku elementach naraz. Kliknięcie w widoczny cytat ukrywa go i
+pokazuje kolejny w kolejce, tworząc efekt karuzeli cyklicznie wracającej do
+pierwszego cytatu. Całość jest zebrana w dwóch działających plikach:
+`index.html` i `skrypt.js`. Poniżej znajdziesz **esencję każdego wzorca** —
+jeśli tylko chcesz sobie przypomnieć jak coś działało, masz to tutaj.
 
-## 📁 Zawartość projektu
+## Struktura projektu
 
 ```text
 07_projekt_cytaty/
-│
-├── README.md         ← ten plik, teoria krok po kroku
-├── index.html         ← pełny, oryginalny plik HTML
-└── skrypt.js           ← pełny, oryginalny plik JS
+├── index.html    -> strona: trzy cytaty, na starcie widoczny tylko pierwszy
+└── skrypt.js     -> funkcja toggleQuotes() + trzy nasłuchiwacze kliknięć
 ```
 
-> ⚠️ **Uwaga:** Kod odwołuje się do plików `styl.css`, `logo.png`, `osoba1.jpg`, `osoba2.jpg` i `osoba3.jpg`, których nie było w treści zadania — musisz sam dodać je do folderu, aby strona wyglądała poprawnie.
+> **Uwaga:** kod odwołuje się do plików `styl.css`, `logo.png`, `osoba1.jpg`,
+> `osoba2.jpg` i `osoba3.jpg`, których nie było w treści zadania — trzeba je
+> samodzielnie dodać, żeby strona wyglądała poprawnie. Na starcie tylko
+> pierwszy cytat jest widoczny — pozostałe dwa mają `style="display: none;"`
+> ustawione na stałe w HTML.
 
 ---
 
-## 🎯 Cel skryptu
+## Ściągawka wzorców
 
-Na stronie widoczny jest w danym momencie **tylko jeden** z trzech cytatów (pozostałe dwa są ukryte przez `style="display: none;"` wpisane na stałe w HTML). Kliknięcie w widoczny cytat ma:
-1. ukryć **ten** cytat, w który kliknięto,
-2. pokazać **kolejny** cytat w cyklicznej kolejności: cytat 1 → cytat 2 → cytat 3 → z powrotem cytat 1.
-
-> **Główna idea:**
-> **KLIKNIĘCIE → ROZPOZNAJ, KTÓRY CYTAT KLIKNIĘTO → UKRYJ TEN CYTAT → POKAŻ NASTĘPNY W KOLEJCE**
-
----
-
-## SEC-1: Jedna funkcja obsługująca wszystkie trzy przypadki (`toggleQuotes`)
+### 1. Jedna funkcja obsługująca wszystkie trzy przypadki
 
 ```javascript
 function toggleQuotes(clickedId) {
-    const quote1 = document.getElementById('osoba1');
-    const quote2 = document.getElementById('osoba2');
-    const quote3 = document.getElementById('osoba3');
+  const quote1 = document.getElementById("osoba1");
+  const quote2 = document.getElementById("osoba2");
+  const quote3 = document.getElementById("osoba3");
 
-    if (clickedId === 'osoba1') {
-        quote1.style.display = 'none';
-        quote2.style.display = 'block';
-    } else if (clickedId === 'osoba2') {
-        quote2.style.display = 'none';
-        quote3.style.display = 'block';
-    } else if (clickedId === 'osoba3') {
-        quote3.style.display = 'none';
-        quote1.style.display = 'block';
-    }
+  if (clickedId === "osoba1") {
+    quote1.style.display = "none";
+    quote2.style.display = "block";
+  } else if (clickedId === "osoba2") {
+    quote2.style.display = "none";
+    quote3.style.display = "block";
+  } else if (clickedId === "osoba3") {
+    quote3.style.display = "none";
+    quote1.style.display = "block";
+  }
 }
 ```
 
-### Jak to działa?
+Funkcja przyjmuje parametr `clickedId` — identyfikator klikniętego cytatu —
+dzięki czemu jedna funkcja obsługuje wszystkie trzy przypadki, zamiast trzech
+niemal identycznych funkcji. Na początku pobierane są wszystkie trzy
+kontenery cytatów naraz, niezależnie od tego, który akurat został kliknięty.
+`===` to porównanie ścisłe (sprawdza wartość **i** typ) — bezpieczniejsze niż
+`==`. Każda gałąź robi dokładnie dwie rzeczy: ukrywa kliknięty cytat
+(`display = 'none'`) i pokazuje następny w kolejce (`display = 'block'`).
+Cykliczność widać w ostatniej gałęzi — po kliknięciu w cytat 3 z powrotem
+pokazywany jest cytat 1, zamykając pętlę 1 → 2 → 3 → 1 → ...
 
-- **`function toggleQuotes(clickedId) { ... }`** — to jest **funkcja parametrowa**, czyli funkcja, która przyjmuje jeden argument wejściowy — tutaj nazwany `clickedId`. Dzięki temu **jedna** funkcja potrafi obsłużyć wszystkie trzy przypadki (kliknięcie w cytat 1, 2 lub 3), zamiast pisać trzy osobne, niemal identyczne funkcje. To właśnie ten wariant, o którym wspomniano w treści zadania: *"Skrypt może być zorganizowany w dowolny sposób, może być to jedna funkcja parametrowa lub trzy osobne dla każdego cytatu"*.
-- **`const quote1 = document.getElementById('osoba1');`** (i analogicznie `quote2`, `quote3`) — na początku funkcji pobieramy **wszystkie trzy** kontenery cytatów (elementy `<div id="osoba1">`, `<div id="osoba2">`, `<div id="osoba3">`) i zapisujemy je w osobnych zmiennych. Robimy to za każdym razem, gdy funkcja jest wywoływana, żeby mieć do nich dostęp niezależnie od tego, który cytat został kliknięty.
-- **`if (clickedId === 'osoba1') { ... }`** — sprawdzamy, **który konkretnie** cytat został kliknięty, porównując przekazany parametr `clickedId` z identyfikatorem `'osoba1'`. Operator **`===`** to porównanie **ścisłe** (sprawdza zarówno wartość, jak i typ danych) — dobra praktyka w JavaScript, bezpieczniejsza niż zwykłe `==`.
-- Wewnątrz każdego bloku `if`/`else if` dzieją się dokładnie **dwie rzeczy**:
-  1. **`quoteN.style.display = 'none';`** — ukrywamy cytat, który został kliknięty, ustawiając jego właściwość CSS `display` na `'none'` (czyli "nie wyświetlaj tego elementu wcale — zajmuje zero miejsca na stronie").
-  2. **`quoteN+1.style.display = 'block';`** — pokazujemy **kolejny** cytat w kolejce, ustawiając jego `display` na `'block'` (czyli "wyświetl ten element jako blok", czyli normalnie, zajmując całą dostępną szerokość).
-- **Cykliczność karuzeli** widać najlepiej w ostatnim bloku (`clickedId === 'osoba3'`): po kliknięciu w **trzeci** cytat, ukrywany jest cytat 3, ale pokazywany jest **z powrotem cytat 1** (`quote1.style.display = 'block';`) — zamykając cały cykl w pętlę: 1 → 2 → 3 → 1 → 2 → 3 → ...
-
----
-
-## SEC-2: Nasłuchiwanie kliknięć na każdym z trzech cytatów (`addEventListener`)
+### 2. Nasłuchiwanie kliknięć na każdym cytacie
 
 ```javascript
-document.getElementById('osoba1').addEventListener('click', function() {
-    toggleQuotes('osoba1');
+document.getElementById("osoba1").addEventListener("click", function () {
+  toggleQuotes("osoba1");
 });
-document.getElementById('osoba2').addEventListener('click', function() {
-    toggleQuotes('osoba2');
+document.getElementById("osoba2").addEventListener("click", function () {
+  toggleQuotes("osoba2");
 });
-document.getElementById('osoba3').addEventListener('click', function() {
-    toggleQuotes('osoba3');
+document.getElementById("osoba3").addEventListener("click", function () {
+  toggleQuotes("osoba3");
 });
 ```
 
-### Jak to działa?
-
-- **`document.getElementById('osoba1')`** — pobieramy kontener pierwszego cytatu.
-- **`.addEventListener('click', function() { ... })`** — metoda **`addEventListener`** "podpina" do elementu **nasłuchiwacz zdarzenia** (*event listener*). Pierwszy argument, `'click'`, mówi, na jaki rodzaj zdarzenia mamy reagować (tutaj: kliknięcie myszką). Drugi argument to **funkcja**, która wykona się **za każdym razem**, gdy to zdarzenie nastąpi (czyli za każdym kliknięciem w ten element).
-- **`function() { toggleQuotes('osoba1'); }`** — to tzw. **funkcja anonimowa** (bez własnej nazwy), przekazana bezpośrednio jako argument do `addEventListener`. Jej jedynym zadaniem jest wywołanie naszej głównej funkcji `toggleQuotes()`, przekazując jej **informację o tym, który konkretnie element został kliknięty** — w tym przypadku na stałe `'osoba1'`, bo ten konkretny nasłuchiwacz jest podpięty właśnie do elementu `osoba1`.
-- Ten sam wzorzec (pobierz element → podepnij nasłuchiwacz → w środku wywołaj `toggleQuotes` z odpowiednim identyfikatorem) powtórzony jest **trzykrotnie** — raz dla każdego z trzech cytatów. Dzięki temu kliknięcie w **którykolwiek** z trzech cytatów uruchomi tę samą funkcję `toggleQuotes()`, tylko z innym parametrem, co pozwala jednej funkcji poprawnie zareagować na każdy z trzech możliwych przypadków.
-
----
-
-## 🧩 Cały mechanizm krok po kroku
-
-```text
-1. Strona ładuje się — widoczny jest tylko cytat #1 (pozostałe mają display: none w HTML)
-              ↓
-2. Użytkownik klika w widoczny cytat (np. cytat #1)
-              ↓
-3. Uruchamia się nasłuchiwacz addEventListener podpięty do osoba1
-              ↓
-4. Wywołanie: toggleQuotes('osoba1')
-              ↓
-5. Wewnątrz funkcji: if (clickedId === 'osoba1')
-              ↓
-6. quote1.style.display = 'none'   (ukryj cytat #1)
-   quote2.style.display = 'block'  (pokaż cytat #2)
-              ↓
-7. Użytkownik widzi teraz cytat #2 i może w niego kliknąć,
-   co uruchomi ten sam mechanizm dla 'osoba2' → pokaże cytat #3
-              ↓
-8. Kliknięcie w cytat #3 → z powrotem pokazuje cytat #1 (cykl się zamyka)
-```
+`addEventListener('click', funkcja)` podpina do elementu nasłuchiwacz, który
+wykonuje się automatycznie przy każdym kliknięciu w ten element. Druga
+przekazana wartość to funkcja anonimowa (bez własnej nazwy) — jej jedynym
+zadaniem jest wywołanie `toggleQuotes()` z identyfikatorem elementu, do
+którego akurat jest podpięta. Ten sam wzorzec powtórzony trzykrotnie —
+osobno dla każdego cytatu — sprawia, że kliknięcie w którykolwiek z nich
+uruchamia tę samą funkcję, tylko z innym parametrem.
 
 ---
 
-## 🧠 Ściągawka z najważniejszych pojęć
+## Tabela referencyjna
 
-| **Pojęcie / Funkcja**              | **Co oznacza / Co robi?**                                                                          |
-| -------------------------------------- | -------------------------------------------------------------------------------------------------------|
-| Funkcja parametrowa                     | Funkcja przyjmująca argument (tu: `clickedId`), dzięki czemu jeden blok kodu obsługuje wiele przypadków. |
-| `===` (porównanie ścisłe)                | Sprawdza, czy dwie wartości są sobie równe **i** mają ten sam typ danych.                                |
-| `style.display = 'none'`                 | Ukrywa element całkowicie — nie zajmuje miejsca na stronie.                                              |
-| `style.display = 'block'`                | Pokazuje element jako blok — zajmuje całą dostępną szerokość, tak jak zwykły `<div>`.                     |
-| `addEventListener('click', funkcja)`      | Podpina funkcję, która wykona się automatycznie za każdym kliknięciem w dany element.                     |
-| Funkcja anonimowa (`function() {...}`)    | Funkcja bez własnej nazwy, zdefiniowana bezpośrednio w miejscu, gdzie jest używana (tu: jako argument `addEventListener`). |
-| Wzorzec "karuzeli" (1 → 2 → 3 → 1 → ...)   | Cykliczne przełączanie między elementami, gdzie ostatni element "zawija się" z powrotem do pierwszego.    |
+| Pojęcie / funkcja                               | Co robi                                                                     |
+| ----------------------------------------------- | --------------------------------------------------------------------------- |
+| Funkcja parametrowa (`toggleQuotes(clickedId)`) | Jeden blok kodu obsługujący wiele przypadków dzięki argumentowi wejściowemu |
+| `===` (porównanie ścisłe)                       | Sprawdza wartość **i** typ danych naraz                                     |
+| `style.display = 'none'`                        | Ukrywa element — nie zajmuje miejsca na stronie                             |
+| `style.display = 'block'`                       | Pokazuje element jako blok, zajmujący całą dostępną szerokość               |
+| `addEventListener('click', funkcja)`            | Podpina funkcję wykonującą się automatycznie przy kliknięciu w element      |
+| Funkcja anonimowa (`function() {...}`)          | Funkcja bez nazwy, zdefiniowana bezpośrednio jako argument                  |
+| Wzorzec "karuzeli" (1 → 2 → 3 → 1 → ...)        | Cykliczne przełączanie, gdzie ostatni element wraca do pierwszego           |

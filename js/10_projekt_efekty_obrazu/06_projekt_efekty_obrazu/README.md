@@ -1,100 +1,133 @@
-# Kompleksowy kurs JavaScript & CSS: Efekty na obrazach (filtr CSS sterowany z JS)
+# Projekt JavaScript + CSS: efekty na obrazach (filtr CSS sterowany z JS)
 
-Witaj w module projektowym **Efekty obrazu**!
+**Słowa kluczowe:** stan pola wyboru (`.checked`), dopisywanie do tekstu (`+=`), przycinanie białych znaków (`.trim()`), stały filtr (`style.filter = 'none'`, `grayscale(100%)`), wartość suwaka (`.value` z `<input type="range">`), szablon literału, właściwość CSS `filter` (`blur`, `sepia`, `invert`, `opacity`, `brightness`).
 
-Ten projekt to strona z czterema niezależnymi blokami, z których każdy pokazuje inny sposób sterowania właściwością CSS `filter` za pomocą JavaScriptu:
+Projekt to cztery niezależne bloki, z których każdy pokazuje inny sposób
+sterowania właściwością CSS `filter` za pomocą JavaScriptu: łączenie kilku
+filtrów naraz na podstawie checkboxów, przełączanie między dwoma stałymi
+stanami, oraz dwie płynne regulacje suwakiem o różnych zakresach wartości.
+Mimo różnych efektów wizualnych wszystkie cztery funkcje opierają się na tym
+samym schemacie: pobierz obraz → odczytaj sterowanie → zbuduj tekst filtra →
+przypisz do `img.style.filter`. Całość jest zebrana w dwóch działających
+plikach: `index.html` i `skrypt.js`. Poniżej znajdziesz **esencję każdego
+wzorca** — jeśli tylko chcesz sobie przypomnieć jak coś działało, masz to
+tutaj. Pełne, powolne tłumaczenie "od zera" (z podziałem na sekcje SEC-1,
+SEC-2...) znajduje się w README każdego podfolderu.
 
-1. łączenie kilku filtrów naraz na podstawie zaznaczonych pól wyboru,
-2. przełączanie między dwoma stałymi stanami (kolor / czarno-biały) dwoma przyciskami,
-3. płynna regulacja przezroczystości suwakiem,
-4. płynna regulacja jasności suwakiem o innym zakresie wartości.
-
-Cały projekt został podzielony na **4 spójne submoduły**, z których każdy odpowiada za jedną z czterech "Transformacji obrazu" opisanych w treści zadania.
-
----
-
-## 📁 Architektura i struktura projektu
+## Struktura projektu
 
 ```text
 06_projekt_efekty_obrazu/
-│
-├── index.html                          ← pełny, oryginalny plik HTML
-├── skrypt.js                           ← pełny, oryginalny plik JS (wszystkie 4 funkcje razem)
-│
-├── 01_filtry_obrazu1/
-│   ├── README.md
-│   └── script.js                       ← funkcja zastosuj() (Transformacja obrazu 1)
-│
-├── 02_szarosc_obrazu2/
-│   ├── README.md
-│   └── script.js                       ← funkcje kolorowy() i czarnobialy() (Transformacja obrazu 2)
-│
-├── 03_przezroczystosc_obrazu3/
-│   ├── README.md
-│   └── script.js                       ← funkcja przezroczystosc() (Transformacja obrazu 3)
-│
-├── 04_jasnosc_obrazu4/
-│   ├── README.md
-│   └── script.js                       ← funkcja jasnosc() (Transformacja obrazu 4)
-│
-└── README.md                           ← ten plik, główny przewodnik projektu
+├── 01_filtry_obrazu1/          -> łączenie filtrów (blur/sepia/invert) na checkboxach
+├── 02_szarosc_obrazu2/         -> dwa stałe przełączniki (kolor / czarno-biały)
+├── 03_przezroczystosc_obrazu3/ -> suwak 0-100 -> opacity()
+├── 04_jasnosc_obrazu4/         -> suwak 0-250 -> brightness()
+├── index.html                  -> pełna strona: cztery bloki razem
+└── skrypt.js                   -> wszystkie cztery funkcje razem
 ```
 
-> ⚠️ **Uwaga:** Kod odwołuje się do plików `styl.css`, `pszczola.jpg`, `pomarancza.jpg`, `owoce.jpg` i `zolw.jpg`, których nie było w treści zadania — musisz sam dodać je do folderu, aby strona wyglądała i działała poprawnie.
+Każdy z modułów zawiera `README.md` (pełne wytłumaczenie) i `script.js`
+(czysta implementacja wzorca). `index.html` i `skrypt.js` łączą te wzorce w
+działającą stronę — każdy blok działa niezależnie od pozostałych, na swoim
+własnym obrazie.
+
+> **Uwaga:** kod odwołuje się do plików `styl.css`, `pszczola.jpg`,
+> `pomarancza.jpg`, `owoce.jpg` i `zolw.jpg`, których nie było w treści
+> zadania — trzeba je samodzielnie dodać, żeby strona wyglądała i działała
+> poprawnie.
 
 ---
 
-## 🎓 Ścieżka edukacyjna
+## Ściągawka wzorców
 
-### 📁 01_filtry_obrazu1 — łączenie wielu filtrów naraz
+### 1. Łączenie wielu filtrów naraz
 
-**Cel:** Sprawdzenie stanu trzech pól wyboru (Blur, Sepia, Negatyw) i zbudowanie jednego, złożonego tekstu filtra CSS, który może zawierać kilka efektów jednocześnie.
+```javascript
+function zastosuj() {
+  let filtr = "";
 
-**Najważniejsze pojęcia:** `.checked`, dopisywanie do tekstu operatorem `+=`, `.trim()`, kilka niezależnych `if` (bez `else`).
+  if (document.getElementById("blur").checked) {
+    filtr += "blur(5px) ";
+  }
+  if (document.getElementById("sepia").checked) {
+    filtr += "sepia(100%) ";
+  }
+  if (document.getElementById("negatyw").checked) {
+    filtr += "invert(100%) ";
+  }
 
-### 📁 02_szarosc_obrazu2 — dwa proste, niezależne przełączniki
-
-**Cel:** Dwie osobne funkcje, z których każda ustawia **jedną, stałą** wartość filtra — bez żadnych warunków.
-
-**Najważniejsze pojęcia:** `style.filter = 'none'`, `grayscale(100%)`.
-
-### 📁 03_przezroczystosc_obrazu3 — suwak sterujący przezroczystością
-
-**Cel:** Odczytanie aktualnej wartości suwaka (zakres 0–100) i zastosowanie na jej podstawie filtra `opacity`.
-
-**Najważniejsze pojęcia:** `querySelector()` z selektorem potomka (`'#blok3 img'`), `.value` suwaka, szablony literałów (`` ` `` + `${...}`).
-
-### 📁 04_jasnosc_obrazu4 — suwak sterujący jasnością (inny zakres)
-
-**Cel:** Odczytanie wartości suwaka (zakres 0–250, bez wartości domyślnej) i zastosowanie filtra `brightness`, pozwalającego rozjaśnić obrazek ponad jego normalny poziom.
-
-**Najważniejsze pojęcia:** `brightness(N%)`, różnice w konfiguracji `<input type="range">` (inny `max`, brak `value`).
-
----
-
-## 🔄 Wspólny wzorzec wszystkich submodułów
-
-Mimo że każdy blok realizuje inny efekt wizualny, wszystkie cztery funkcje opierają się na tym samym, uniwersalnym schemacie:
-
-```text
-1. Pobierz element <img>, na który ma zadziałać efekt
-              ↓
-2. Odczytaj stan sterowania (pole wyboru .checked / suwak .value)
-              ↓
-3. Zbuduj (lub wybierz gotowy) tekst filtra CSS
-              ↓
-4. Przypisz go do img.style.filter
-              ↓
-5. Przeglądarka natychmiast przerysowuje obrazek z nowym efektem
+  document.querySelector("#blok1 img").style.filter = filtr.trim();
+}
 ```
 
+Trzy niezależne `if` (bez `else`) sprawdzają `.checked` każdego pola
+osobno — użytkownik może zaznaczyć dowolną kombinację, więc każdy efekt
+dopisuje się do tekstu filtra operatorem `+=`, a nie zastępuje poprzedni.
+`.trim()` na końcu usuwa nadmiarową spację, gdyby żaden checkbox nie był
+zaznaczony (wtedy filtr byłby pustym tekstem).
+
+→ Pełne wytłumaczenie: [`01_filtry_obrazu1/README.md`](./01_filtry_obrazu1/README.md)
+
+### 2. Dwa proste, stałe przełączniki
+
+```javascript
+function kolorowy() {
+  document.querySelector("#blok2 img").style.filter = "none";
+}
+
+function czarnobialy() {
+  document.querySelector("#blok2 img").style.filter = "grayscale(100%)";
+}
+```
+
+Najprostszy z czterech wzorców — żadnych warunków, żadnego odczytu danych.
+Każda funkcja odpowiada jednemu przyciskowi i ustawia zawsze tę samą, stałą
+wartość filtra: `'none'` przywraca oryginalny obraz, `grayscale(100%)`
+zamienia go w pełni na czarno-biały.
+
+→ Pełne wytłumaczenie: [`02_szarosc_obrazu2/README.md`](./02_szarosc_obrazu2/README.md)
+
+### 3. Suwak sterujący przezroczystością
+
+```javascript
+function przezroczystosc() {
+  const wartosc = document.getElementById("suwak3").value;
+  document.querySelector("#blok3 img").style.filter = `opacity(${wartosc}%)`;
+}
+```
+
+`.value` suwaka (`<input type="range">`) zwraca aktualną pozycję jako tekst
+w zakresie 0–100. Szablon literału (backticki + `${...}`) wstawia tę wartość
+bezpośrednio do tekstu filtra `opacity(N%)` — im niższa wartość, tym
+bardziej przezroczysty obraz. Funkcja wywoływana jest przy każdej zmianie
+pozycji suwaka, więc efekt aktualizuje się płynnie w czasie rzeczywistym.
+
+→ Pełne wytłumaczenie: [`03_przezroczystosc_obrazu3/README.md`](./03_przezroczystosc_obrazu3/README.md)
+
+### 4. Suwak sterujący jasnością (inny zakres)
+
+```javascript
+function jasnosc() {
+  const wartosc = document.getElementById("suwak4").value;
+  document.querySelector("#blok4 img").style.filter = `brightness(${wartosc}%)`;
+}
+```
+
+Ten sam schemat co przy przezroczystości, ale z suwakiem skonfigurowanym
+inaczej: zakres 0–250 (zamiast 0–100) i bez ustawionej wartości domyślnej w
+HTML. Wyższy dopuszczalny zakres pozwala nie tylko przyciemnić obraz, ale
+też rozjaśnić go ponad jego normalny, wyjściowy poziom — `brightness(100%)`
+to stan bez zmian, wartości powyżej rozjaśniają.
+
+→ Pełne wytłumaczenie: [`04_jasnosc_obrazu4/README.md`](./04_jasnosc_obrazu4/README.md)
+
 ---
 
-## 🧠 Podsumowanie i wzorce do zapamiętania
+## Tabela referencyjna
 
-| Submoduł                     | Kluczowa właściwość / filtr CSS | Zastosowanie                                     |
-| -------------------------------- | ---------------------------------- | --------------------------------------------------- |
-| `01_filtry_obrazu1`              | `blur()`, `sepia()`, `invert()`     | Łączenie wielu filtrów naraz na podstawie checkboxów |
-| `02_szarosc_obrazu2`              | `'none'`, `grayscale(100%)`         | Dwa proste, stałe przełączniki stylu                 |
-| `03_przezroczystosc_obrazu3`      | `opacity(N%)`                       | Płynna regulacja przezroczystości suwakiem            |
-| `04_jasnosc_obrazu4`               | `brightness(N%)`                    | Płynna regulacja jasności suwakiem o szerszym zakresie |
+| Plik / moduł                 | Kluczowa właściwość / filtr CSS       | Zastosowanie                                                   |
+| ---------------------------- | ------------------------------------- | -------------------------------------------------------------- |
+| `01_filtry_obrazu1`          | `.checked`, `+=`, `blur/sepia/invert` | Łączenie wielu filtrów naraz na podstawie checkboxów           |
+| `02_szarosc_obrazu2`         | `'none'`, `grayscale(100%)`           | Dwa proste, stałe przełączniki stylu                           |
+| `03_przezroczystosc_obrazu3` | `.value` suwaka, `opacity(N%)`        | Płynna regulacja przezroczystości suwakiem (0–100)             |
+| `04_jasnosc_obrazu4`         | `.value` suwaka, `brightness(N%)`     | Płynna regulacja jasności suwakiem o szerszym zakresie (0–250) |

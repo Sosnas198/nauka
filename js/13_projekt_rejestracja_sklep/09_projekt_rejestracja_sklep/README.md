@@ -1,88 +1,135 @@
-# Kompleksowy kurs JavaScript: Rejestracja w sklepie – zakładki, pasek postępu, zatwierdzanie danych
+# Projekt JavaScript + DOM: rejestracja w sklepie (zakładki, pasek postępu, zatwierdzanie danych)
 
-Witaj w module projektowym **Rejestracja w sklepie**!
+**Słowa kluczowe:** funkcja parametrowa (`aktywujZakladke`), przełączanie widoczności (`style.display`), zdarzenie opuszczenia pola (`blur`), zaznaczenie wielu elementów naraz (`querySelectorAll` + `forEach`), selektor bezpośredniego potomka (`#postep > div`), odczyt wartości pola (`.value`), operator warunkowy (`? :`), wypisanie w konsoli (`console.log()`).
 
-Ten projekt to wieloetapowy formularz rejestracyjny, który:
+Projekt to wieloetapowy formularz rejestracyjny złożony z trzech niezależnych
+od siebie mechanizmów działających na tym samym formularzu: przełączania
+widocznej zakładki, rosnącego wizualnie paska postępu oraz końcowego
+zebrania i wypisania wszystkich wpisanych danych — również tych ukrytych w
+niewidocznych aktualnie zakładkach. Żaden z trzech mechanizmów nie wywołuje
+bezpośrednio drugiego — razem tworzą spójne doświadczenie użytkownika.
+Całość jest zebrana w dwóch działających plikach: `index.html` i
+`skrypt.js`. Poniżej znajdziesz **esencję każdego wzorca** — jeśli tylko
+chcesz sobie przypomnieć jak coś działało, masz to tutaj. Pełne, powolne
+tłumaczenie "od zera" (z podziałem na sekcje SEC-1, SEC-2...) znajduje się w
+README każdego podfolderu.
 
-1. dzieli dane na trzy zakładki ("Klient", "Adres", "Kontakt"), pokazując zawsze tylko jedną naraz,
-2. pokazuje wizualny pasek postępu, rosnący za każdym razem, gdy użytkownik opuści pole formularza,
-3. po kliknięciu "Zatwiedź dane" zbiera wszystkie wpisane wartości i wypisuje je w konsoli przeglądarki.
-
-Cały projekt został podzielony na **3 spójne submoduły**, z których każdy odpowiada za jedną z trzech funkcji opisanych w treści zadania: *Funkcja aktywująca*, *Funkcja zmieniająca wartość paska postępu* oraz *Funkcja zatwierdzająca*.
-
----
-
-## 📁 Architektura i struktura projektu
+## Struktura projektu
 
 ```text
 09_projekt_rejestracja_sklep/
-│
-├── index.html                        ← pełny, oryginalny plik HTML
-├── skrypt.js                         ← pełny, oryginalny plik JS (wszystkie funkcje razem)
-│
-├── 01_aktywacja_zakladek/
-│   ├── README.md
-│   └── script.js                     ← Funkcja aktywująca (aktywujZakladke, klient, adres, kontakt)
-│
-├── 02_pasek_postepu/
-│   ├── README.md
-│   └── script.js                     ← Funkcja zmieniająca pasek postępu (aktualizujPostep + nasłuchiwacze blur)
-│
-├── 03_zatwierdzanie_danych/
-│   ├── README.md
-│   └── script.js                     ← Funkcja zatwierdzająca (zatwierdz)
-│
-└── README.md                         ← ten plik, główny przewodnik projektu
+├── 01_aktywacja_zakladek/       -> przełączanie widocznej zakładki formularza
+├── 02_pasek_postepu/            -> rosnący pasek postępu po opuszczeniu pola
+├── 03_zatwierdzanie_danych/     -> zebranie i wypisanie wszystkich danych
+├── index.html                   -> pełna strona: formularz + zakładki + pasek
+└── skrypt.js                    -> wszystkie trzy mechanizmy razem
 ```
 
-> ⚠️ **Uwaga:** Kod odwołuje się do plików `styl.css` i `obraz.png`, których nie było w treści zadania — musisz sam dodać je do folderu, aby strona wyglądała poprawnie.
+Każdy z modułów zawiera `README.md` (pełne wytłumaczenie) i `script.js`
+(czysta implementacja wzorca). `index.html` i `skrypt.js` łączą te wzorce w
+działającą stronę — moduły są logicznie niezależne i żaden nie wywołuje
+bezpośrednio drugiego.
+
+> **Uwaga:** kod odwołuje się do plików `styl.css` i `obraz.png`, których nie
+> było w treści zadania — trzeba je samodzielnie dodać, żeby strona
+> wyglądała poprawnie.
 
 ---
 
-## 🎓 Ścieżka edukacyjna
+## Ściągawka wzorców
 
-### 📁 01_aktywacja_zakladek — przełączanie widocznej zakładki
+### 1. Przełączanie widocznej zakładki
 
-**Cel:** Ukrycie wszystkich trzech bloków formularza i pokazanie tylko tego, którego przycisk kliknięto.
+```javascript
+function aktywujZakladke(nazwa) {
+  document.getElementById("klient").style.display = "none";
+  document.getElementById("adres").style.display = "none";
+  document.getElementById("kontakt").style.display = "none";
 
-**Najważniejsze pojęcia:** funkcja parametrowa (`aktywujZakladke`), `style.display`, funkcje "opakowujące" (`klient`, `adres`, `kontakt`).
+  document.getElementById(nazwa).style.display = "block";
+}
 
-### 📁 02_pasek_postepu — wizualny wskaźnik wypełnienia formularza
-
-**Cel:** Zwiększanie szerokości paska postępu o 12% za każdym opuszczeniem pola formularza (zdarzenie `blur`), z podwójnym zabezpieczeniem przed przekroczeniem 100%.
-
-**Najważniejsze pojęcia:** zdarzenie `blur`, `querySelectorAll()` + `forEach()`, selektor "bezpośredni potomek" (`#postep > div`), zabezpieczenie zakresu wartości.
-
-### 📁 03_zatwierdzanie_danych — zebranie i wypisanie wszystkich danych
-
-**Cel:** Odczytanie wartości wszystkich pól formularza (również tych w ukrytych zakładkach) i wypisanie ich w konsoli przeglądarki po kliknięciu "Zatwiedź dane".
-
-**Najważniejsze pojęcia:** `.value`, fakt że ukryty element zachowuje swoje dane, operator warunkowy (`? :`), `console.log()`.
-
----
-
-## 🔄 Jak submoduły łączą się ze sobą?
-
-Wszystkie trzy submoduły działają na **tym samym formularzu**, ale każdy odpowiada za inny aspekt jego zachowania — są od siebie logicznie niezależne (żaden nie wywołuje bezpośrednio drugiego), lecz razem tworzą spójne doświadczenie użytkownika:
-
-```text
-                     Użytkownik wypełnia formularz
-                                │
-        ┌───────────────────────┼───────────────────────┐
-        ▼                       ▼                       ▼
-01_aktywacja_zakladek    02_pasek_postepu        03_zatwierdzanie_danych
-(przełącza widoczność    (rośnie po każdym        (na końcu, po kliknięciu
- bloku po kliknięciu      opuszczeniu pola,        "Zatwiedź dane", zbiera
- przycisku zakładki)      niezależnie od            WSZYSTKIE dane, także
-                          aktywnej zakładki)         z ukrytych zakładek)
+function klient() {
+  aktywujZakladke("klient");
+}
+function adres() {
+  aktywujZakladke("adres");
+}
+function kontakt() {
+  aktywujZakladke("kontakt");
+}
 ```
 
+Funkcja parametrowa `aktywujZakladke()` najpierw ukrywa wszystkie trzy bloki
+formularza, a potem pokazuje tylko ten jeden, którego nazwę dostała jako
+argument — dzięki temu zawsze widoczna jest dokładnie jedna zakładka.
+Funkcje `klient()`, `adres()` i `kontakt()` to cienkie "opakowania"
+wywołujące tę samą logikę z różnym parametrem — to one są bezpośrednio
+podpięte pod przyciski zakładek w HTML.
+
+→ Pełne wytłumaczenie: [`01_aktywacja_zakladek/README.md`](./01_aktywacja_zakladek/README.md)
+
+### 2. Wizualny pasek postępu
+
+```javascript
+function aktualizujPostep() {
+  const pasek = document.querySelector("#postep > div");
+  let szerokosc = parseInt(pasek.style.width) || 0;
+
+  szerokosc += 12;
+  if (szerokosc > 100) {
+    szerokosc = 100;
+  }
+
+  pasek.style.width = szerokosc + "%";
+}
+
+document.querySelectorAll("input").forEach(function (pole) {
+  pole.addEventListener("blur", aktualizujPostep);
+});
+```
+
+Zdarzenie `blur` uruchamia się w momencie **opuszczenia** pola (kliknięcia
+poza nim), a nie przy każdym wpisanym znaku. `querySelectorAll("input")` +
+`forEach()` podpina ten sam nasłuchiwacz do wszystkich pól formularza naraz,
+niezależnie od tego, w której są zakładce. Selektor `#postep > div` wybiera
+tylko **bezpośredniego** potomka kontenera paska — czyli sam wypełniany pasek,
+nie jego dzieci. Warunek `if (szerokosc > 100)` to zabezpieczenie przed
+przekroczeniem 100% szerokości, gdyby użytkownik opuścił więcej pól niż
+wynosi jeden pełny cykl paska.
+
+→ Pełne wytłumaczenie: [`02_pasek_postepu/README.md`](./02_pasek_postepu/README.md)
+
+### 3. Zebranie i wypisanie wszystkich danych
+
+```javascript
+function zatwierdz() {
+  const imie = document.getElementById("imie").value;
+  const email = document.getElementById("email").value
+    ? document.getElementById("email").value
+    : "brak";
+
+  console.log(imie, email /* , ... pozostałe pola */);
+}
+```
+
+`.value` odczytuje aktualną wartość pola formularza — działa dokładnie tak
+samo, niezależnie od tego, czy pole znajduje się aktualnie w widocznej, czy w
+ukrytej (przez `style.display = "none"`) zakładce; ukryty element nie traci
+swoich danych. Operator warunkowy `? :` to skrócony zapis `if/else` w jednej
+linii — sprawdza, czy wartość pola istnieje, i podstawia tekst zastępczy
+(`"brak"`), gdy pole jest puste. Na końcu wszystkie zebrane wartości trafiają
+do `console.log()`, widocznego w konsoli przeglądarki.
+
+→ Pełne wytłumaczenie: [`03_zatwierdzanie_danych/README.md`](./03_zatwierdzanie_danych/README.md)
+
 ---
 
-## 🧠 Podsumowanie i wzorce do zapamiętania
+## Tabela referencyjna
 
-| Submoduł                     | Kluczowa technika                                    | Zastosowanie                                        |
-| -------------------------------- | -------------------------------------------------------- | -------------------------------------------------------- |
-| `01_aktywacja_zakladek`           | funkcja parametrowa + `style.display`                     | Przełączanie widocznej sekcji formularza                  |
-| `02_pasek_postepu`                 | zdarzenie `blur` + `querySelectorAll().forEach()`          | Wizualny wskaźnik postępu wypełniania formularza           |
-| `03_zatwierdzanie_danych`          | `.value` + operator warunkowy `? :` + `console.log()`       | Zebranie i wypisanie wszystkich danych formularza          |
+| Plik / moduł              | Kluczowa technika                                                 | Zastosowanie                                      |
+| ------------------------- | ----------------------------------------------------------------- | ------------------------------------------------- |
+| `01_aktywacja_zakladek`   | funkcja parametrowa, `style.display`                              | Przełączanie widocznej sekcji formularza          |
+| `02_pasek_postepu`        | zdarzenie `blur`, `querySelectorAll().forEach()`, `#postep > div` | Wizualny wskaźnik postępu wypełniania formularza  |
+| `03_zatwierdzanie_danych` | `.value`, operator warunkowy `? :`, `console.log()`               | Zebranie i wypisanie wszystkich danych formularza |
+| `skrypt.js`               | moduły 1 + 2 + 3                                                  | Skrypt strony rejestracji                         |
