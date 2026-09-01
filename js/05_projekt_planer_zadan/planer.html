@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Planer zadań</title>
+        <link rel="stylesheet" href="styl.css">
+    </head>
+    <body>
+        <aside>
+            <img src="obraz.jpg" alt="notatki">
+        </aside>
+        <header>
+            <h2>Moje zadania</h2>
+        </header>
+        <nav>
+            <input type="text" name="zadanie" id="zadanie" placeholder="dodaj zadanie...">
+            <button type="button" onlick="dodaj()">Dodaj</button>
+        </nav>
+        <main>
+            <ul>
+                <li>Wyprowadzić psa <button type="button" onlick="wykonane(this)">Wykonane</button></li>
+                <li>Gimnastyka <button type="button" onlick="wykonane(this)">Wykonane</button></li>
+                <li>Zakupy <button type="button" onlick="wykonane(this)">Wykonane</button></li>
+                <li>Spacer z kumplem <button type="button" onlick="wykonane(this)">Wykonane</button></li>
+                <li>Odrabianie lekcji z młodszą siostrą <button type="button" onlick="wykonane(this)">Wykonane</button></li>
+                <li>Projekt na geografię <button type="button" onlick="wykonane(this)">Wykonane</button></li>
+            </ul>
+        </main>
+        <footer>
+            <h3>Notatki: <a href="https://ee-informatyk.pl/" target="_blank" style="text-decoration: none;color: unset;">EE-Informatyk.pl</a></h3>
+        </footer>
+        <script src="main.js"></script>
+    </body>
+</html>

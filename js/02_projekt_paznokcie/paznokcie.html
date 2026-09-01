@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twoje wymarzone paznokcie</title>
+    <link rel="stylesheet" href="styl.css">
+</head>
+<body>
+    <main>
+        <header>
+            <h1>Twoje wymarzone paznokcie</h1>
+        </header>
+
+        <nav>
+            <!-- Moduł 02: [SEC-1] Zdarzenie onmouseover (najechanie, nie kliknięcie) -->
+            <button onmouseover="kolor()">Kolor</button>
+            <button onmouseover="ksztalt()">Kształt</button>
+            <button onmouseover="wzor()">Wzór</button>
+        </nav>
+
+        <div id="sekcja1">
+            <h2>Kolor</h2>
+            <img src="kolory.png" alt="Kolory paznokci"><br>
+            <input type="color" name="kolor" id="kolor" value="#FF0000">
+        </div>
+
+        <div id="sekcja2">
+            <h2>Kształt</h2>
+            <img src="ksztalt.png" alt="Kształty paznokci"><br>
+            <select name="ksztalt" id="ksztalt">
+                <option value="migdal">Migdał</option>
+                <option value="zaokraglony">Zaokrąglony</option>
+                <option value="kwadratowy">Kwadratowy</option>
+                <option value="balerina">Balerina</option>
+                <option value="zaokraglony_kwadrat">Zaokrąglony kwadrat</option>
+            </select>
+        </div>
+
+        <div id="sekcja3">
+            <h2>Wzór</h2>
+            <script>
+                // POŁĄCZONY WZORZEC — Moduł 01 (Skrypt 1)
+                // -----------------------------------------------------------------------------
+                for (let i = 1; i <= 10; i++) {
+                    // Moduł 01: [SEC-1] Pętla 1…10 oraz [SEC-2] createElement("img")
+                    const obraz = document.createElement("img");
+
+                    // Moduł 01: [SEC-3] src = i.jpg, klasa wzory, title = numer (dymek)
+                    obraz.src = i + ".jpg";
+                    obraz.className = "wzory";
+                    obraz.title = i;
+
+                    // Moduł 01: [SEC-4] Wklejenie do rodzica skryptu (#sekcja3)
+                    document.currentScript.parentElement.appendChild(obraz);
+                }
+            </script>
+            <br>
+            <input type="number" name="wzor" id="wzor" min="1" max="10" step="1">
+        </div>
+    </main>
+
+    <footer>
+        <p>Autor strony: 00000000000</p>
+    </footer>
+
+    <script>
+        // POŁĄCZONY WZORZEC — Moduł 02 (Skrypt 2)
+        // -----------------------------------------------------------------------------
+
+        // Moduł 02: [SEC-5] Funkcja kolor — najechanie na pierwszy przycisk
+        function kolor() {
+            // Moduł 02: [SEC-2] Sekcja 1: block, pozostałe: none
+            document.getElementById("sekcja1").style.display = "block";
+            document.getElementById("sekcja2").style.display = "none";
+            document.getElementById("sekcja3").style.display = "none";
+
+            // Moduł 02: [SEC-3, SEC-4] querySelectorAll — Salmon / Crimson
+            const przyciski = document.querySelectorAll("nav button");
+            przyciski[0].style.backgroundColor = "Salmon";
+            przyciski[1].style.backgroundColor = "Crimson";
+            przyciski[2].style.backgroundColor = "Crimson";
+        }
+
+        // Moduł 02: [SEC-5] Funkcja ksztalt — najechanie na drugi przycisk
+        function ksztalt() {
+            document.getElementById("sekcja1").style.display = "none";
+            document.getElementById("sekcja2").style.display = "block";
+            document.getElementById("sekcja3").style.display = "none";
+
+            const przyciski = document.querySelectorAll("nav button");
+            przyciski[0].style.backgroundColor = "Crimson";
+            przyciski[1].style.backgroundColor = "Salmon";
+            przyciski[2].style.backgroundColor = "Crimson";
+        }
+
+        // Moduł 02: [SEC-5] Funkcja wzor — najechanie na trzeci przycisk
+        function wzor() {
+            document.getElementById("sekcja1").style.display = "none";
+            document.getElementById("sekcja2").style.display = "none";
+            document.getElementById("sekcja3").style.display = "block";
+
+            const przyciski = document.querySelectorAll("nav button");
+            przyciski[0].style.backgroundColor = "Crimson";
+            przyciski[1].style.backgroundColor = "Crimson";
+            przyciski[2].style.backgroundColor = "Salmon";
+        }
+    </script>
+</body>
+</html>
